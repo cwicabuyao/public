@@ -21,16 +21,19 @@
       padding: 30px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      animation: fadeIn 1s ease-in-out;
     }
 
     h1 {
       font-size: 2em;
       margin-bottom: 10px;
       color: #444;
+      animation: slideDown 1s ease;
     }
 
     p {
       margin: 8px 0;
+      animation: fadeIn 2s ease;
     }
 
     .steps {
@@ -45,11 +48,18 @@
       flex: 1;
       min-width: 120px;
       margin: 10px;
+      opacity: 0;
+      animation: fadeUp 1s forwards;
     }
 
+    .step:nth-child(1) { animation-delay: 0.5s; }
+    .step:nth-child(2) { animation-delay: 1s; }
+    .step:nth-child(3) { animation-delay: 1.5s; }
+
     .step img {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
+      animation: pulse 2s infinite;
     }
 
     .status {
@@ -65,6 +75,12 @@
       color: red;
     }
 
+    .arrow {
+      font-size: 2em;
+      opacity: 0;
+      animation: fadeIn 1s forwards, bounce 2s infinite;
+    }
+
     .columns {
       display: flex;
       flex-wrap: wrap;
@@ -76,6 +92,33 @@
     .column {
       flex: 1;
       min-width: 250px;
+      animation: fadeIn 2s ease;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
     @media (max-width: 600px) {
@@ -84,6 +127,9 @@
       }
       .steps {
         flex-direction: column;
+      }
+      .arrow {
+        transform: rotate(90deg);
       }
     }
   </style>
@@ -98,10 +144,13 @@
         <img src="https://img.icons8.com/ios-filled/50/000000/internet-browser.png" alt="Browser">
         <div class="status working">Browser Working</div>
       </div>
+
+
       <div class="step">
         <img src="https://img.icons8.com/ios-filled/50/000000/cloud.png" alt="Cloudflare">
         <div class="status working">Cloudflare Working</div>
       </div>
+
       <div class="step">
         <img src="https://img.icons8.com/ios-filled/50/000000/server.png" alt="Host">
         <div class="status error">Host Error</div>
