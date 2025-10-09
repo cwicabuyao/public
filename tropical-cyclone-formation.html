@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CWI-CABUYAO TROPICAL CYCLONE FORMATION</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: #0f172a;
+      color: white;
+      padding: 10px 5px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-left: 5px;
+    }
+    .header-left img {
+      height: 85px;
+    }
+    .header-info {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .header-info strong {
+      display: block;
+      font-size: 120%;
+    }
+    .header-time {
+      text-align: right;
+      font-size: 17px;
+      font-weight: bold;
+      margin-top: 10px;
+      margin-right: 5px;
+    }
+
+    /* Dashboard Bar */
+    .dashboard-bar {
+      background: #0c2d48;
+      color: white;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+
+    /* Menu Button */
+    .menu-btn {
+      background: #c1121f;
+      color: white;
+      padding: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Side Menu */
+    .side-menu {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #1e1e1e;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+      z-index: 1000;
+    }
+    .side-menu a {
+      padding: 12px 25px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+      transition: 0.3s;
+    }
+    .side-menu a:hover {
+      background: #333;
+    }
+    .side-menu .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* Alert & Content */
+    .container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .alert-header {
+      background: black;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .alert-body {
+      background: #5b5b5b;
+      text-align: left;
+      padding: 18px;
+      margin: auto
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* Forecast Image */
+    .forecast {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .forecast:hover {
+      transform: scale(1.03);
+    }
+
+    .input-img {
+      text-align: center;
+    }
+
+    /* Zoom Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      padding-top: 50px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      width: 90%;
+      max-width: 800px;
+      border-radius: 10px;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .close:hover {
+      color: #ccc;
+    }
+
+    /* Footer */
+    .footer {
+      font-size: 60%;
+      text-align: center;
+      padding: 20px;
+      margin-top: 50px;
+      background: #f1f1f1;
+      color: black;
+      border-top: 1px solid #ccc;
+      line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        text-align: center;
+        flex-direction: column;
+      }
+      .header-left {
+        justify-content: center;
+      }
+      .header-time {
+        text-align: center;
+        margin-top: 5px;
+      }
+      .dashboard-bar {
+        font-size: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <img src="logo1.png" alt="Logo 1">
+      <img src="logo2.png" alt="Logo 2">
+      <div class="header-info">
+        <strong>CABUYAO CITY WEATHER INFORMATION</strong>
+        PROVINCE OF LAGUNA, PHILIPPINES<br>
+        information.cwicabuyao.gov.ph@gmail.com
+      </div>
+    </div>
+    <div class="header-time">
+      <div id="date"></div>
+      <div id="time"></div>
+    </div>
+  </div>
+
+  <!-- Menu Button -->
+  <div class="menu-btn" onclick="openMenu()">☰ Menu</div>
+
+  <!-- Side Menu -->
+  <div id="sideMenu" class="side-menu">
+    <a href="javascript:void(0)" class="close-btn" onclick="closeMenu()">&times;</a>
+    <a href="https://cwicabuyao.github.io/public/weather">• WEATHER</a>
+    <a href="https://cwicabuyao.github.io/public/thunderstorm-warning">Thunderstorm Warning</a>
+    <a href="https://cwicabuyao.github.io/public/rainfall-warning">Rainfall Warning</a>
+    <a href="#">• CLIMATE</a>
+    <a href="#">• HYDROLOGICAL</a>
+    <a href="#">• ASTRO</a>
+  </div>
+
+  <!-- Dashboard Bar -->
+  <div class="dashboard-bar">TROPICAL CYCLONE FORMATION</div>
+
+  <style>
+  .forecast-summary {
+    max-width: 850px;
+    margin: auto;
+    text-align: left;
+    font-family: Arial, sans-serif;
+    color: white;
+    line-height: 1.5;
+    padding: 0 15px;
+  }
+
+  .forecast-summary h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .forecast-summary h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 25px;
+    margin-bottom: 8px;
+  }
+
+  .forecast-summary p {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .forecast-summary strong {
+    font-weight: bold;
+  }
+
+  @media (max-width: 600px) {
+    .forecast-summary {
+      font-size: 15px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+  }
+</style>
+
+<div class="forecast-summary">
+  <p><strong>Date Issued:</strong> 08 October 2025<br>
+  <strong>Valid:</strong> Until Models Change the Forecast</p>
+
+  <h3>Forecast Summary:<br> Week-1 (October 10-16 2025) </h3>
+  
+  <p>
+    <li>TC (TS NAKRI) formed over the eastern boundary of the TCAD and is expected to move generally northward.
+        Moreover, model forecasts indicate that a (TCF①) will emerge east of the PAR and move
+         across the Luzon-Visayas area with a low likelihood of TC formation during week-1.</li>
+  </p>
+  <p>Therefore, the TC-THREAT POTENTIAL IS UNLIKELY over the forecast period.</p>
+  <p>
+    However, any changes in the forecast pattern will be closely monitored, and updates will be issued as needed.
+  </p>
+</div>
+
+
+
+
+
+
+<style>
+  .map-container {
+    text-align: center;
+    position: relative;
+  }
+
+  iframe {
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .fullscreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9998;
+  }
+
+  .float-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    background: #0078ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+  }
+
+  .float-btn:hover {
+    background: #005fcc;
+  }
+
+  /* Exit button - always on top */
+  .exit-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    background: #ff3333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 10000; /* higher than iframe */
+  }
+
+  .exit-btn:hover {
+    background: #cc0000;
+  }
+</style>
+
+
+
+
+<style>
+  .map-container {
+    text-align: center;
+    position: relative;
+  }
+
+  iframe {
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .fullscreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9998;
+  }
+
+  .float-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    background: #0078ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    align-items: center;
+  }
+
+  .float-btn:hover {
+    background: #005fcc;
+  }
+
+  .exit-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 25px;
+    background: #ff3333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+  }
+
+  .exit-btn:hover {
+    background: #cc0000;
+  }
+</style>
+
+<div class="map-container">
+  <iframe id="mapFrame" width="400" height="400"
+    src="https://api.maptiler.com/maps/0199b24d-e217-7e31-8c12-987719032903/?key=1uXJufymofNDgGrvPfCm#3.4/12.18724/130.09635">
+  </iframe>
+  <button class="float-btn" id="expandBtn" onclick="expandMap()">Expand Map</button>
+</div>
+
+<!-- Exit button outside the container -->
+<button class="exit-btn" id="exitBtn" onclick="redirectExit()">Exit</button>
+
+<script>
+  const iframe = document.getElementById("mapFrame");
+  const expandBtn = document.getElementById("expandBtn");
+  const exitBtn = document.getElementById("exitBtn");
+
+  function expandMap() {
+    iframe.classList.add("fullscreen");
+    expandBtn.style.display = "none";
+    exitBtn.style.display = "block";
+  }
+
+  function redirectExit() {
+    window.location.href = "https://cwicabuyao.github.io/tropical-cyclone-formation";
+  }
+</script>
+ 
+ <style>
+  .tc-update {
+    max-width: 800px;
+    margin: auto;
+    text-align: left;
+    font-family: Arial, sans-serif;
+    color: white;
+    line-height: 1.6;
+    padding: 0 15px;
+  }
+
+  .tc-update p {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .tc-update {
+      font-size: 15px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+  }
+</style>
+
+<div class="tc-update">
+  <p>
+    This Tropical Cyclone Formation was created by Cabuyao City Weather Information 
+    to help the public better understand any potential storms or weather disturbances entering 
+    the Philippine Area of Responsibility.
+  </p>
+  <p>
+    We conduct this because our agency continuously monitors developing weather systems. 
+    We need our own forecast to keep track of possible tropical disturbances or weather systems 
+    that may enter the country.
+  </p>
+  <p>
+    However, we do not recommend using our forecast as the official reference. 
+    We still highly recommend following the official forecasts issued by DOST-PAGASA.
+  </p>
+  <p>
+    Our forecast is only generated by our Weather and Climate Team, using data from various 
+    weather models. This allows us to identify any tropical disturbances that may develop 
+    and affect not only the Philippines but also our monitored area here in the City of Cabuyao.
+  </p>
+</div>
+
+
+  <!-- Zoom Modal -->
+  <div id="forecastModal" class="modal">
+    <span class="close" id="closeModal">&times;</span>
+    <img class="modal-content" id="forecastZoom">
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    VERSION: 19.02.3Q PUBLISHED ON 020925<br>
+    CREATED BY RESEARCH AND DEVELOPMENT TEAM (RDD)<br>
+    THIS SITE MAINTAIN BY SYSTEM SERVERS BY ©TYMO_ALDRIN<br>
+    ALL RIGHTS RESERVED CWI-CABUYAO 2025-2026
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+      document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    function openMenu() {
+      document.getElementById("sideMenu").style.width = "250px";
+    }
+    function closeMenu() {
+      document.getElementById("sideMenu").style.width = "0";
+    }
+
+    // Forecast Image Zoom Script
+    const modal = document.getElementById("forecastModal");
+    const img = document.getElementById("forecastImg");
+    const modalImg = document.getElementById("forecastZoom");
+    const closeBtn = document.getElementById("closeModal");
+
+    img.onclick = function() {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+    }
+
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
